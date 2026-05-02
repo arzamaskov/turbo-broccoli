@@ -3,8 +3,10 @@ DOCKER_COMPOSE_PROD = docker compose -f compose.prod.yaml --env-file .env.prod
 PHP_CONTAINER = php
 APP_URL = http://localhost:8080
 TEST_DATABASE_URL = sqlite:///%kernel.project_dir%/var/test/test.db
+BACKUP_DIR = backups
+BACKUP_FILE ?= $(BACKUP_DIR)/runtracker-$$(date +%Y%m%d-%H%M%S).db
 
-.PHONY: help build up down restart logs ps shell sh composer sf console install db cache-clear lint lint-fix phpstan deptrac test qa prod-build prod-up prod-down prod-logs
+.PHONY: help build up down restart logs ps shell sh composer sf console install db cache-clear lint lint-fix phpstan deptrac test qa prod-build prod-up prod-down prod-logs prod-db-backup prod-db-restore
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -83,3 +85,16 @@ prod-down: ## Stop and remove production containers
 
 prod-logs: ## Show production container logs (follow mode)
 	$(DOCKER_COMPOSE_PROD) logs -f --tail=100
+
+prod-db-backup: ## Copy production SQLite database to BACKUP_FILE
+	mkdir -p $(BACKUP_DIR)
+	$(DOCKER_COMPOSE_PROD) exec -T -u app $(PHP_CONTAINER) sqlite3 var/data/app.db ".backup '/tmp/runtracker-backup.db'"
+	$(DOCKER_COMPOSE_PROD) cp $(PHP_CONTAINER):/tmp/runtracker-backup.db $(BACKUP_FILE)
+	$(DOCKER_COMPOSE_PROD) exec -T -u app $(PHP_CONTAINER) rm -f /tmp/runtracker-backup.db
+
+prod-db-restore: ## Restore production SQLite database from BACKUP_FILE
+	test -n "$(BACKUP_FILE)"
+	test -f "$(BACKUP_FILE)"
+	$(DOCKER_COMPOSE_PROD) cp $(BACKUP_FILE) $(PHP_CONTAINER):/tmp/runtracker-restore.db
+	$(DOCKER_COMPOSE_PROD) exec -T -u app $(PHP_CONTAINER) sh -lc 'sqlite3 /tmp/runtracker-restore.db "PRAGMA quick_check;" | grep -qx ok'
+	$(DOCKER_COMPOSE_PROD) exec -T -u app $(PHP_CONTAINER) sh -lc 'sqlite3 var/data/app.db ".restore /tmp/runtracker-restore.db" && rm -f /tmp/runtracker-restore.db'

@@ -11,6 +11,15 @@ run_as_app() {
 
 mkdir -p var/cache var/log var/data var/test
 
+if [ "${APP_ENV:-dev}" = "prod" ]; then
+  case "${APP_SECRET:-}" in
+    ""|"change-me-with-a-real-random-secret"|"change-me-in-local-env"|"build-time-secret")
+      echo "APP_SECRET must be set to a real secret in production." >&2
+      exit 1
+      ;;
+  esac
+fi
+
 if [ "$(id -u)" = "0" ]; then
   chown -R app:app var/cache var/log var/data var/test /tmp/composer
 fi

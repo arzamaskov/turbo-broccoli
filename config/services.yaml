@@ -5,3 +5,7 @@ services:
 
   App\:
     resource: '../src/'
+
+  App\Controller\HealthController:
+    arguments:
+      $projectDir: '%kernel.project_dir%'

@@ -17,11 +17,10 @@ services:
       DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data/app.db"
     volumes:
       - prod_sqlite_data:/app/var/data
-      - prod_cache:/app/var/cache
       - prod_logs:/app/var/log
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "php-fpm -t >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "php-fpm -t >/dev/null 2>&1 && php bin/console about --env=prod --no-debug >/dev/null 2>&1 && test -w var/data/app.db"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -44,5 +43,4 @@ services:
 
 volumes:
   prod_sqlite_data:
-  prod_cache:
   prod_logs:

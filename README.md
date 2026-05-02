@@ -44,14 +44,24 @@ Create a production env file:
 cp .env.prod.example .env.prod
 ```
 
-Set a strong `APP_SECRET`, then build and run:
+Set a strong `APP_SECRET`; production containers refuse to start with an empty
+or placeholder secret. Then build and run:
 
 ```bash
 make prod-build
 make prod-up
 ```
 
-The production compose file builds immutable PHP and nginx images, keeps SQLite/cache/logs in Docker volumes, disables debug mode, and uses PHP opcache settings suited for production.
+The production compose file builds immutable PHP and nginx images, disables
+debug mode, and uses PHP opcache settings suited for production. The production
+cache is warmed into the image. SQLite data and logs are kept in Docker volumes.
+
+Back up or restore the production SQLite database with:
+
+```bash
+make prod-db-backup
+make prod-db-restore BACKUP_FILE=backups/runtracker-YYYYMMDD-HHMMSS.db
+```
 
 ## Notes
 

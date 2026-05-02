@@ -22,7 +22,7 @@ services:
       - composer_cache:/tmp/composer
       - sqlite_data:/app/var/data
     healthcheck:
-      test: ["CMD-SHELL", "php-fpm -t >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "php-fpm -t >/dev/null 2>&1 && php bin/console about >/dev/null 2>&1 && test -w var/data/app.db"]
       interval: 10s
       timeout: 5s
       retries: 5

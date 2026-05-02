@@ -7,4 +7,5 @@ var/log/*
 var/data/*
 node_modules
 .env*
+backups
 docker-compose.override.yml

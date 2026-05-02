@@ -11,6 +11,7 @@
 !/var/data/.gitkeep
 !/var/test/.gitkeep
 /.phpunit.cache/
+/backups/
 
 ###> symfony/framework-bundle ###
 /.env.local
