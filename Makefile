@@ -3,6 +3,7 @@ DOCKER_COMPOSE_PROD = docker compose -f compose.prod.yaml --env-file .env.prod
 PHP_CONTAINER = php
 APP_URL = http://localhost:8080
 TEST_DATABASE_URL = sqlite:///%kernel.project_dir%/var/test/test.db
+PHPSTAN_PATHS = src
 BACKUP_DIR = backups
 BACKUP_FILE ?= $(BACKUP_DIR)/runtracker-$$(date +%Y%m%d-%H%M%S).db
 
@@ -56,19 +57,19 @@ cache-clear: ## Clear Symfony cache
 ## ---- Quality & Testing ----
 
 lint: ## Run PHP-CS-Fixer in dry-run mode
-	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'test -x vendor/bin/php-cs-fixer && vendor/bin/php-cs-fixer fix --dry-run --diff || php bin/console lint:container'
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/php-cs-fixer ]; then vendor/bin/php-cs-fixer fix --dry-run --diff; else php bin/console lint:container; fi'
 
 lint-fix: ## Fix code style with PHP-CS-Fixer
-	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'test -x vendor/bin/php-cs-fixer && vendor/bin/php-cs-fixer fix || echo "php-cs-fixer is not installed"'
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/php-cs-fixer ]; then vendor/bin/php-cs-fixer fix; else echo "php-cs-fixer is not installed" >&2; exit 1; fi'
 
 phpstan: ## Run PHPStan static analysis
-	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'test -x vendor/bin/phpstan && vendor/bin/phpstan analyse || echo "phpstan is not installed"'
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/phpstan ]; then vendor/bin/phpstan analyse $(PHPSTAN_PATHS); else echo "phpstan is not installed" >&2; exit 1; fi'
 
 deptrac: ## Run architecture dependency checks (Deptrac)
-	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'test -x vendor/bin/deptrac && vendor/bin/deptrac analyse || echo "deptrac is not installed"'
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/deptrac ]; then vendor/bin/deptrac analyse; else echo "deptrac is not installed" >&2; exit 1; fi'
 
 test: ## Run PHPUnit tests
-	$(DOCKER_COMPOSE) exec -u app -e APP_ENV=test -e APP_DEBUG=1 -e DATABASE_URL='$(TEST_DATABASE_URL)' $(PHP_CONTAINER) sh -lc 'test -x bin/phpunit && bin/phpunit || php bin/console lint:container'
+	$(DOCKER_COMPOSE) exec -u app -e APP_ENV=test -e APP_DEBUG=1 -e DATABASE_URL='$(TEST_DATABASE_URL)' $(PHP_CONTAINER) sh -lc 'if [ -x bin/phpunit ]; then mkdir -p var/test && touch var/test/test.db && bin/phpunit --fail-on-empty-test-suite; else echo "phpunit is not installed" >&2; exit 1; fi'
 
 qa: lint phpstan deptrac test ## Run all quality checks (lint + phpstan + deptrac + tests)
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use PDO;
@@ -8,12 +10,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Throwable;
 
-final class HealthController
+final readonly class HealthController
 {
     public function __construct(
-        private readonly string $projectDir,
-    ) {
-    }
+        private string $projectDir,
+    ) {}
 
     #[Route('/health', name: 'health', methods: ['GET'])]
     public function __invoke(): JsonResponse
@@ -27,7 +28,7 @@ final class HealthController
             ], 503);
         }
 
-        return new JsonResponse(['status' => 'ok']);
+        return new JsonResponse(['status' => 'OK']);
     }
 
     private function checkSqlite(): void
@@ -41,8 +42,8 @@ final class HealthController
         }
 
         $path = match (true) {
-            str_starts_with($databaseUrl, $projectDirPrefix) => $this->projectDir.'/'.substr($databaseUrl, strlen($projectDirPrefix)),
-            str_starts_with($databaseUrl, $appDirPrefix) => '/app/'.substr($databaseUrl, strlen($appDirPrefix)),
+            str_starts_with($databaseUrl, $projectDirPrefix) => $this->projectDir . '/' . substr($databaseUrl, strlen($projectDirPrefix)),
+            str_starts_with($databaseUrl, $appDirPrefix) => '/app/' . substr($databaseUrl, strlen($appDirPrefix)),
             default => null,
         };
 
@@ -60,7 +61,7 @@ final class HealthController
             throw new RuntimeException('sqlite database is not writable');
         }
 
-        $pdo = new PDO('sqlite:'.$path);
+        $pdo = new PDO('sqlite:' . $path);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $statement = $pdo->query('PRAGMA quick_check');
