@@ -1,0 +1,10 @@
+.git
+.idea
+.vscode
+vendor
+var/cache/*
+var/log/*
+var/data/*
+node_modules
+.env*
+docker-compose.override.yml
