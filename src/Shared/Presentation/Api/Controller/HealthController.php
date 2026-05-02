@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Shared\Presentation\Api\Controller;
 
 use PDO;
 use RuntimeException;
