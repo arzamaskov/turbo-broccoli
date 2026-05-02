@@ -3,7 +3,6 @@ DOCKER_COMPOSE_PROD = docker compose -f compose.prod.yaml --env-file .env.prod
 PHP_CONTAINER = php
 APP_URL = http://localhost:8080
 TEST_DATABASE_URL = sqlite:///%kernel.project_dir%/var/test/test.db
-PHPSTAN_PATHS = src
 BACKUP_DIR = backups
 BACKUP_FILE ?= $(BACKUP_DIR)/runtracker-$$(date +%Y%m%d-%H%M%S).db
 
@@ -63,7 +62,7 @@ lint-fix: ## Fix code style with PHP-CS-Fixer
 	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/php-cs-fixer ]; then vendor/bin/php-cs-fixer fix; else echo "php-cs-fixer is not installed" >&2; exit 1; fi'
 
 phpstan: ## Run PHPStan static analysis
-	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/phpstan ]; then vendor/bin/phpstan analyse $(PHPSTAN_PATHS); else echo "phpstan is not installed" >&2; exit 1; fi'
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/phpstan ]; then vendor/bin/phpstan analyse; else echo "phpstan is not installed" >&2; exit 1; fi'
 
 deptrac: ## Run architecture dependency checks (Deptrac)
 	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/deptrac ]; then vendor/bin/deptrac analyse; else echo "deptrac is not installed" >&2; exit 1; fi'
