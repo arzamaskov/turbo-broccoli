@@ -10,6 +10,9 @@
     "ext-pdo": "*",
     "ext-pdo_sqlite": "*",
     "doctrine/dbal": "^4.0",
+    "doctrine/doctrine-bundle": "^2.18",
+    "doctrine/doctrine-migrations-bundle": "^3.7",
+    "doctrine/orm": "^3.6",
     "symfony/console": "7.4.*",
     "symfony/dotenv": "7.4.*",
     "symfony/flex": "^2.5",
@@ -71,7 +74,8 @@
   "extra": {
     "symfony": {
       "allow-contrib": false,
-      "require": "7.4.*"
+      "require": "7.4.*",
+      "docker": false
     }
   }
 }

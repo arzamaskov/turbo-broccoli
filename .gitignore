@@ -13,6 +13,7 @@
 /.phpunit.cache/
 /backups/
 /.deptrac.cache
+/config/reference.php
 
 ###> symfony/framework-bundle ###
 /.env.local
