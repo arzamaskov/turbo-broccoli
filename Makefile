@@ -6,7 +6,7 @@ TEST_DATABASE_URL = sqlite:///%kernel.project_dir%/var/test/test.db
 BACKUP_DIR = backups
 BACKUP_FILE ?= $(BACKUP_DIR)/runtracker-$$(date +%Y%m%d-%H%M%S).db
 
-.PHONY: help build up down restart logs ps shell sh composer sf console install db cache-clear lint lint-fix phpstan deptrac test qa prod-build prod-up prod-down prod-logs prod-db-backup prod-db-restore
+.PHONY: help build up down restart logs ps shell sh composer sf console install db cache-clear tailwind-build tailwind-watch lint lint-fix phpstan deptrac test qa prod-build prod-up prod-down prod-logs prod-db-backup prod-db-restore
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -52,6 +52,12 @@ db: ## Open SQLite database shell
 
 cache-clear: ## Clear Symfony cache
 	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) php bin/console cache:clear
+
+tailwind-build: ## Build Tailwind CSS assets
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) php bin/console tailwind:build
+
+tailwind-watch: ## Build Tailwind CSS assets in watch mode
+	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) php bin/console tailwind:build --watch
 
 ## ---- Quality & Testing ----
 
