@@ -1,9 +1,22 @@
 services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
-    bind:
-      string $projectDir: '%kernel.project_dir%'
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            string $projectDir: '%kernel.project_dir%'
 
-  App\:
-    resource: '../src/'
+    App\:
+        resource: '../src/'
+
+    App\Identity\Domain\Repository\UserRepositoryInterface:
+        alias: App\Identity\Infrastructure\Persistence\Doctrine\DoctrineUserRepository
+
+when@test:
+    services:
+        App\Identity\Domain\Repository\UserRepositoryInterface:
+            alias: App\Identity\Infrastructure\Persistence\Doctrine\DoctrineUserRepository
+            public: true
+
+        App\Shared\Application\Persistence\FlusherInterface:
+            alias: App\Shared\Infrastructure\Persistence\Doctrine\DoctrineFlusher
+            public: true

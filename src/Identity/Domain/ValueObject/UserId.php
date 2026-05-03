@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Domain\ValueObject;
 
 use InvalidArgumentException;
+use Symfony\Component\Uid\Ulid;
 
 final readonly class UserId extends StringValueObject
 {
@@ -17,5 +18,10 @@ final readonly class UserId extends StringValueObject
         }
 
         return new self($ulid);
+    }
+
+    public static function generate(): self
+    {
+        return new self(Ulid::generate());
     }
 }

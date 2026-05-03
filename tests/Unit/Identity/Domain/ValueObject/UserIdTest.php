@@ -18,6 +18,15 @@ class UserIdTest extends TestCase
         $this->assertSame($userId->value(), $ulid);
     }
 
+    public function test_it_generates_user_id(): void
+    {
+        $userId = UserId::generate();
+        $anotherUserId = UserId::generate();
+
+        $this->assertMatchesRegularExpression('/^[0-7][0-9A-HJKMNP-TV-Z]{25}$/', $userId->value());
+        $this->assertFalse($userId->equals($anotherUserId));
+    }
+
     public function test_it_throws_exception_for_invalid_ulid(): void
     {
         $this->expectException(InvalidArgumentException::class);

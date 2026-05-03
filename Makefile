@@ -74,7 +74,7 @@ deptrac: ## Run architecture dependency checks (Deptrac)
 	$(DOCKER_COMPOSE) exec -u app $(PHP_CONTAINER) sh -lc 'if [ -x vendor/bin/deptrac ]; then vendor/bin/deptrac analyse; else echo "deptrac is not installed" >&2; exit 1; fi'
 
 test: ## Run PHPUnit tests
-	$(DOCKER_COMPOSE) exec -u app -e APP_ENV=test -e APP_DEBUG=1 -e DATABASE_URL='$(TEST_DATABASE_URL)' $(PHP_CONTAINER) sh -lc 'if [ -x bin/phpunit ]; then mkdir -p var/test && touch var/test/test.db && bin/phpunit --testdox --fail-on-empty-test-suite; else echo "phpunit is not installed" >&2; exit 1; fi'
+	$(DOCKER_COMPOSE) exec -u app -e APP_ENV=test -e APP_DEBUG=1 -e DATABASE_URL='$(TEST_DATABASE_URL)' $(PHP_CONTAINER) sh -lc 'if [ -x bin/phpunit ]; then mkdir -p var/test && touch var/test/test.db && php bin/console doctrine:schema:drop --force --quiet && php bin/console doctrine:schema:create --quiet && bin/phpunit --testdox --fail-on-empty-test-suite; else echo "phpunit is not installed" >&2; exit 1; fi'
 
 qa: lint phpstan deptrac test ## Run all quality checks (lint + phpstan + deptrac + tests)
 
