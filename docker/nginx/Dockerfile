@@ -1,6 +1,0 @@
-FROM nginx:1.27-alpine
-
-WORKDIR /app
-
-COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
-COPY public /app/public
