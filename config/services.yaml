@@ -11,6 +11,17 @@ services:
     App\Identity\Domain\Repository\UserRepositoryInterface:
         alias: App\Identity\Infrastructure\Persistence\Doctrine\DoctrineUserRepository
 
+    #============== Identity Bounded Context ==============
+    # Infrastructure buses
+    App\Shared\Infrastructure\Bus\CommandBus:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Shared\Infrastructure\Bus\QueryBus:
+        arguments:
+            $queryBus: '@query.bus'
+
+
 when@test:
     services:
         App\Identity\Domain\Repository\UserRepositoryInterface:
